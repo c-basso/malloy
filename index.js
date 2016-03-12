@@ -31,18 +31,6 @@ function getKeyboard (msg) {
 };
 
 
-function getKeyboard2 (msg) {
-	return {
-		reply_markup: JSON.stringify({
-			keyboard: [
-				['year', 'month']
-			],
-			force_reply: true
-		})
-	};
-};
-
-
 function checkAuth(userId, callback){
 
 	function findCallback(result){
@@ -133,7 +121,7 @@ function start (msg) {
 	var userId = msg.from.id;
 	checkAuth(userId, function (user) {
 		var keyboard = getKeyboard(msg);
-		bot.sendMessage(userId, 'lol', keyboard);
+		bot.sendMessage(userId, 'https://youtu.be/f_J8QU1m0Ng', keyboard);
 	});
 };
 
