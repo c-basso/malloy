@@ -3,20 +3,32 @@
 var Store = require('./lib/db');
 var store = new Store();
 
-// store.createTable('users');
+store.createTable('users');
+store.createTable('steps');
 
 // store.insert({
 // 	table: 'users',
 // 	data: {
-// 		id: 1,
-// 		name: 'hodor'
+// 		uid: 58373175,
+// 		token: ''
 // 	}
 // });
 
-store.find({
-	table: 'users',
-	data: {name: 'hodor'},
-	callback: function (result) {
-		console.log(result);
-	}
-});
+
+// store.update({
+// 	table: 'users',
+// 	data: {
+// 		uid: 58373175,
+// 		token: 'hodor'
+// 	}
+// });
+
+// store.find({
+// 	table: 'users',
+// 	data: {uid: 58373175},
+// 	callback: function (result) {
+// 		console.log(result);
+// 	}
+// });
+
+
