@@ -13,10 +13,10 @@ var store = new Store();
 // 	}
 // });
 
-// store.find({
-// 	table: 'users',
-// 	data: {name: 'hodor'},
-// 	callback: function (result) {
-// 		console.log(result);
-// 	}
-// });
+store.find({
+	table: 'users',
+	data: {name: 'hodor'},
+	callback: function (result) {
+		console.log(result);
+	}
+});

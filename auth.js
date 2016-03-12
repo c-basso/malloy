@@ -10,13 +10,11 @@ env(__dirname + '/.env');
 
 var PORT = process.env.PORT;
 
-var fn = jade.compile(fs.readFileSync('templates/auth.js'));
+var fn = jade.compile(fs.readFileSync('templates/auth.js'),'utf8');
 var htmlOutput = fn({
-	maintainer: {
-		name: 'Forbes Lindesay',
-		twitter: '@ForbesLindesay',
-		blog: 'forbeslindesay.co.uk'
-	}
+	client_id: '11',
+	redirect_uri: 'https://example.com',
+	scope: 'account-info'
 });
 
 dispatcher.onGet("/auth", function(req, res) {
