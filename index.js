@@ -109,7 +109,7 @@ function help (msg) {
 	var cmds = [
 		'/help Показывает возможности',
 		'/inout Паказывает пирожок',
-		'/typepie Паказывает граффик пополнений'
+		'/typepie Паказывает пирожок'
 	];
 
 	var keyboard = getKeyboard(msg);
