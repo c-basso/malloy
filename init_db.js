@@ -4,7 +4,6 @@ var Store = require('./lib/db');
 var store = new Store();
 
 store.createTable('users');
-store.createTable('steps');
 
 // store.insert({
 // 	table: 'users',

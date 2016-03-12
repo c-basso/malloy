@@ -66,13 +66,7 @@ function checkAuth(userId, callback){
 			bot.sendMessage(userId, message);
 
 		} else {
-			store.find({
-				table: 'steps',
-				data: {uid: userId},
-				callback: function (step) {
-					callback(result, step);
-				}
-			});
+			callback(result);
 		}
 	}
 
@@ -88,14 +82,23 @@ function inout (msg) {
 	var userId = msg.from.id;
 
 	checkAuth(userId, function (user) {
-		var keyboard = getKeyboard2(msg);
+		history(user, function (err, operations) {
+			var stat = new Stat(operations);
 
-		store.insert({
-			table: 'steps',
-			data: {uid: userId, step: 'inout'}
+			var data = stat.getYearBar(stat.byYear());
+
+			bar(userId, 'year', data, function (fname) {
+				bot.sendPhoto(userId, fname, {caption: 'Ваши пополнения и снятия с кошелька за год'});
+
+				data = stat.getMonthBar(stat.byMonth(operations));
+
+				bar(userId, 'month', data, function (fname) {
+					bot.sendPhoto(userId, fname, {caption: 'Ваши пополнения и снятия с кошелька за месяц'});
+				});
+
+			});
+
 		});
-
-		bot.sendMessage(userId, 'Выберите период', keyboard);
 	});
 };
 
@@ -138,38 +141,3 @@ bot.onText(/\/help/, help);
 bot.onText(/\/start/, start);
 bot.onText(/\/inout/, inout);
 bot.onText(/\/typepie/, typepie);
-
-bot.on('message', function (msg) {
-	var userId = msg.from.id;
-
-	if (msg.text === 'year' || msg.text === 'month') {
-
-		checkAuth(userId, function (user, step) {
-			if (!_.isEmpty(step)) {
-
-				history(user, function (err, operations) {
-					var stat = new Stat(operations);
-
-					if(msg.text === 'year'){
-						var data = stat.getYearBar(stat.byYear());
-
-						bar(data, function (fname) {
-							bot.sendPhoto(userId, fname, {caption: 'Ваши пополнения и снятия с кошелька за год'});
-						});
-					} else {
-						var data = stat.getMonthBar(stat.byMonth(operations));
-
-						bar(data, function (fname) {
-							bot.sendPhoto(userId, fname, {caption: 'Ваши пополнения и снятия с кошелька за месяц'});
-						});
-					}
-
-				});
-
-			}
-		});
-
-	}
-
-});
-
