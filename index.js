@@ -12,13 +12,16 @@ var pie = require('./lib/pie');
 
 env(__dirname + '/.env');
 
+var TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+var PULLING_INTERVAL = process.env.PULLING_INTERVAL;
 var YM_CLIENT_ID = process.env.YM_CLIENT_ID;
 var YM_REDIRECT_URI = process.env.YM_REDIRECT_URI;
 var YM_CLIENT_SECRET = process.env.YM_CLIENT_SECRET;
 var SCOPE = ['account-info', 'operation-history', 'operation-details'];
 
+
 var store = new Store();
-var bot = new TelegramBot('185738543:AAFLunW95X6NvtWhKTeuGhiD-hV7pHvte3M', {polling: {interval: 5000}});
+var bot = new TelegramBot(TELEGRAM_TOKEN, {polling: {interval: PULLING_INTERVAL}});
 
 
 function getKeyboard (msg) {
@@ -52,7 +55,7 @@ function checkAuth(userId, callback){
 
 			var message = '[Авторизируйтесь](' + url + ') через Яндекс.Деньги';
 
-			bot.sendMessage(userId, message);
+			bot.sendMessage(userId, message, {parse_mode: 'Markdown'});
 
 		} else {
 			callback(result);
