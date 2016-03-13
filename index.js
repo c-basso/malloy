@@ -8,6 +8,7 @@ var Store = require('./lib/db');
 var Stat = require('./lib/stat');
 var history = require('./lib/history');
 var bar = require('./lib/bar');
+var pie = require('./lib/pie');
 
 env(__dirname + '/.env');
 
@@ -97,6 +98,12 @@ function typepie (msg) {
 		history(user, function (err, operations) {
 
 			var stat = new Stat(operations);
+
+			var data = stat.getYearPie(stat.byYear());
+
+			pie(userId, 'year', data, function (fname) {
+				bot.sendPhoto(userId, fname, {caption: 'Ваши траты за год'});
+			});
 
 		});
 	});
