@@ -101,8 +101,16 @@ function typepie (msg) {
 
 			var data = stat.getYearPie(stat.byYear());
 
+			console.log(data);
+
 			pie(userId, 'year', data, function (fname) {
 				bot.sendPhoto(userId, fname, {caption: 'Ваши траты за год'});
+
+				data = stat.getMonthPie(stat.byMonth(operations));
+
+				pie(userId, 'month', data, function (fname) {
+					bot.sendPhoto(userId, fname, {caption: 'Ваши траты за месяц'});
+				});
 			});
 
 		});
