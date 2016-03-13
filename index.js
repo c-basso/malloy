@@ -92,8 +92,8 @@ function inout (msg) {
 			bar(userId, 'year', data.data, function (fname) {
 				bot.sendPhoto(userId, fname, {
 					caption: 'Синим я отметил твои доходы, а оранжевым расходы. '
-							+ 'За год ' + data.year + ' у тебя получилось ' + data.in
-							+ ' рублей доходов и ' + data.out + ' рублей расходов'
+							+ '\nЗа ' + data.year + ' год у тебя получилось:\n' + data.in
+							+ ' рублей доходов \n' + data.out + ' рублей расходов'
 				});
 
 				data = stat.getMonthBar(stat.byMonth(operations));
@@ -101,8 +101,8 @@ function inout (msg) {
 				bar(userId, 'month', data.data, function (fname) {
 					bot.sendPhoto(userId, fname, {
 						caption: 'Синим я отметил твои доходы, а оранжевым расходы. '
-							+ 'За месяц ' + data.month + ' у тебя получилось ' + data.in
-							+ ' рублей доходов и ' + data.out + ' рублей расходов'
+							+ '\nЗа месяц ' + data.month + ' у тебя получилось:\n' + data.in
+							+ ' рублей доходов \n' + data.out + ' рублей расходов'
 					});
 				});
 

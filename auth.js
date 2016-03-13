@@ -57,9 +57,10 @@ dispatcher.beforeFilter(/\//, function(req, res, chain) { //any url
 					return {
 						reply_markup: JSON.stringify({
 							keyboard: [
-								['/typepie', '/inout'],
-								['/help']
-							]
+								['🌓 категории расходов', '📊 доходы+расходы'],
+								['❔ помощь']
+							],
+							resize_keyboard: true
 						})
 					};
 				};
