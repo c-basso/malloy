@@ -28,9 +28,10 @@ function getKeyboard () {
 	return {
 		reply_markup: JSON.stringify({
 			keyboard: [
-				['/typepie', '/inout'],
-				['/help']
-			]
+				['🌓 категории расходов', '📊 доходы+расходы'],
+				['❔ помощь']
+			],
+			resize_keyboard: true
 		})
 	};
 };
@@ -117,19 +118,41 @@ function typepie (msg) {
 	checkAuth(userId, function (user) {
 		history(user, function (err, operations) {
 
+			bot.sendMessage(userId, 'Сейчас я пришлю тебе два графика: за этот год и за этот месяц');
+
 			var stat = new Stat(operations);
 
 			var data = stat.getYearPie(stat.byYear());
 
-			console.log(data);
-
 			pie(userId, 'year', data, function (fname) {
-				bot.sendPhoto(userId, fname, {caption: 'Ваши траты за год'});
+
+				var notZero = _.filter(data, function (item) {
+					return item.value > 0;
+				});
+
+				var texts = _.map(notZero, function (item) {
+					return item.text;
+				});
+
+				texts.unshift('Это график за текущий год');
+
+				bot.sendPhoto(userId, fname, {caption: texts.join('\n')});
 
 				data = stat.getMonthPie(stat.byMonth(operations));
 
 				pie(userId, 'month', data, function (fname) {
-					bot.sendPhoto(userId, fname, {caption: 'Ваши траты за месяц'});
+
+					notZero = _.filter(data, function (item) {
+						return item.value > 0;
+					});
+
+					texts = _.map(notZero, function (item) {
+						return item.text;
+					});
+
+					texts.unshift('Это график за текущий месяц');
+
+					bot.sendPhoto(userId, fname, {caption: texts.join('\n')});
 				});
 			});
 
@@ -165,19 +188,24 @@ function start (msg) {
 	});
 };
 
-bot.onText(/\/help/, help);
 bot.onText(/\/start/, start);
+
+bot.onText(/\/help/, help);
 bot.onText(/\/inout/, inout);
 bot.onText(/\/typepie/, typepie);
+
+bot.onText(/❔ помощь/, help);
+bot.onText(/📊 доходы\+расход/, inout);
+bot.onText(/🌓 категории расходов/, typepie);
 
 
 bot.on('message', function (msg) {
 	var userId = msg.from.id;
 	var cmds = ['/help', '/start', '/inout', '/typepie'];
-
 	var re = new RegExp(cmds.join("|"), "i");
+	var re2 = new RegExp(['❔', '📊', '🌓'].join("|"));
 
-	if (!msg.text.match(re)) {
+	if (!msg.text.match(re) && !re2.test(msg.text)) {
 		var keyboard = getKeyboard(msg);
 		bot.sendMessage(userId, 'Щито? Я не пониль...', keyboard);
 	}
