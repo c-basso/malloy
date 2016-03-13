@@ -4,6 +4,7 @@ var _ = require('lodash');
 var ym = require('yandex-money-sdk');
 var env = require('node-env-file');
 var dispatcher = require('httpdispatcher');
+var TelegramBot = require('node-telegram-bot-api');
 var http = require('http');
 var url = require('url');
 var Store = require('./lib/db');
@@ -15,9 +16,12 @@ env(__dirname + '/.env');
 var PORT = process.env.PORT;
 var BOT_NAME = process.env.BOT_NAME;
 var YM_CLIENT_ID = process.env.YM_CLIENT_ID;
+var TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 var YM_REDIRECT_URI = process.env.YM_REDIRECT_URI;
 var YM_CLIENT_SECRET = process.env.YM_CLIENT_SECRET;
 var SCOPE = ['account-info', 'operation-history', 'operation-details'];
+
+
 
 
 dispatcher.beforeFilter(/\//, function(req, res, chain) { //any url
@@ -46,6 +50,26 @@ dispatcher.beforeFilter(/\//, function(req, res, chain) { //any url
 					table: 'users',
 					data: result
 				});
+
+				var bot = new TelegramBot(TELEGRAM_TOKEN);
+
+				function getKeyboard (msg) {
+					return {
+						reply_markup: JSON.stringify({
+							keyboard: [
+								['/typepie', '/inout'],
+								['/help']
+							]
+						})
+					};
+				};
+
+				var message = [
+					'Отлично!',
+					'Теперь можно посмотреть твою статистику.',
+				];
+
+				bot.sendMessage(uid, message.join('\n'), getKeyboard());
 			}
 
 			chain.next(req, res, chain);
