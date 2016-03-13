@@ -24,11 +24,12 @@ var store = new Store();
 var bot = new TelegramBot(TELEGRAM_TOKEN, {polling: {interval: PULLING_INTERVAL}});
 
 
-function getKeyboard (msg) {
+function getKeyboard () {
 	return {
 		reply_markup: JSON.stringify({
 			keyboard: [
-				['/typepie', '/inout']
+				['/typepie', '/inout'],
+				['/help']
 			]
 		})
 	};
@@ -53,9 +54,14 @@ function checkAuth(userId, callback){
 			var redirectUri = [YM_REDIRECT_URI, 'uid=' + userId].join('?');
 			var url = ym.Wallet.buildObtainTokenUrl(YM_CLIENT_ID, redirectUri, SCOPE);
 
-			var message = '[Авторизируйтесь](' + url + ') через Яндекс.Деньги';
+			var message = [
+				'Привет!',
+				'Меня зовут Маршал Ериксон и я помогу тебе присмотреть за тратами.',
+				'Друзья меня знают, как гуру графиков [https://youtu.be/f_J8QU1m0Ng](https://youtu.be/f_J8QU1m0Ng)',
+				'Чтобы начать мне нужно чтобы ты [разрешил мне посмотреть](' + url + ') историю твоих операций в Яндекс.Деньгах'
+			];
 
-			bot.sendMessage(userId, message, {parse_mode: 'Markdown'});
+			bot.sendMessage(userId, message.join('\n'), {parse_mode: 'Markdown'});
 
 		} else {
 			callback(result);
@@ -75,17 +81,28 @@ function inout (msg) {
 
 	checkAuth(userId, function (user) {
 		history(user, function (err, operations) {
+
+			bot.sendMessage(userId, 'Сейчас я пришлю тебе два графика: за этот год и за этот месяц');
+
 			var stat = new Stat(operations);
 
 			var data = stat.getYearBar(stat.byYear());
 
-			bar(userId, 'year', data, function (fname) {
-				bot.sendPhoto(userId, fname, {caption: 'Ваши пополнения и снятия с кошелька за год'});
+			bar(userId, 'year', data.data, function (fname) {
+				bot.sendPhoto(userId, fname, {
+					caption: 'Синим я отметил твои доходы, а оранжевым расходы. '
+							+ 'За год ' + data.year + ' у тебя получилось ' + data.in
+							+ ' рублей доходов и ' + data.out + ' рублей расходов'
+				});
 
 				data = stat.getMonthBar(stat.byMonth(operations));
 
-				bar(userId, 'month', data, function (fname) {
-					bot.sendPhoto(userId, fname, {caption: 'Ваши пополнения и снятия с кошелька за месяц'});
+				bar(userId, 'month', data.data, function (fname) {
+					bot.sendPhoto(userId, fname, {
+						caption: 'Синим я отметил твои доходы, а оранжевым расходы. '
+							+ 'За месяц ' + data.month + ' у тебя получилось ' + data.in
+							+ ' рублей доходов и ' + data.out + ' рублей расходов'
+					});
 				});
 
 			});
@@ -125,9 +142,14 @@ function help (msg) {
 	var userId = msg.from.id;
 
 	var cmds = [
-		'/help Показывает возможности',
-		'/inout Паказывает пирожок',
-		'/typepie Паказывает пирожок'
+		'Очень хороший вопрос!',
+		'Я могу показать тебе то, как делятся твои траты по тому, на что ты тратишь.',
+		'Пусть /typepie будет нашим кодовым словом для этого, но лучше используй кнопки',
+		'',
+		'Также я могу показать тебе как распределяются твои траты и доходы во времени.',
+		'Для этого напиши мне /inuot, но лучше нажми кнопку',
+		'',
+		'А если ты напишешь /help я повторю этот рассказ снова и мне не надоест 😁'
 	];
 
 	var keyboard = getKeyboard(msg);
@@ -147,3 +169,16 @@ bot.onText(/\/help/, help);
 bot.onText(/\/start/, start);
 bot.onText(/\/inout/, inout);
 bot.onText(/\/typepie/, typepie);
+
+
+bot.on('message', function (msg) {
+	var userId = msg.from.id;
+	var cmds = ['/help', '/start', '/inout', '/typepie'];
+
+	var re = new RegExp(cmds.join("|"), "i");
+
+	if (!msg.text.match(re)) {
+		var keyboard = getKeyboard(msg);
+		bot.sendMessage(userId, 'Щито? Я не пониль...', keyboard);
+	}
+});
